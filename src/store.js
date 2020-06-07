@@ -24,10 +24,10 @@ const store = new Vuex.Store({
         })();
       });
     },
-    signIn(store, { email, password }) {
+    signIn({}, { email, password }) {
       return auth.signInWithEmailAndPassword(email, password);
     },
-    signOut({ commit }) {
+    signOut() {
       return auth.signOut();
     }
   },
