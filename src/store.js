@@ -4,9 +4,9 @@ import { auth } from './firebase';
 
 Vue.use(Vuex);
 
-export default new Vuex.Store({
+const store = new Vuex.Store({
   state: {
-    user: null
+    user: undefined
   },
   mutations: {
     user(state, user){
@@ -14,22 +14,20 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    getCurrentUser({ commit, state }) {
-      return new Promise((resolve, reject) => {
-        const unsubscribe = auth.onAuthStateChanged(user => {
-          unsubscribe();
-          if(state.user !== user) {
-            commit('user', user);
+    getCurrentUser({ state }) {
+      return new Promise(resolve => {
+        (function checkIfUserIsDefined(){
+          if(state.user !== undefined){
+            return resolve(state.user);
           }
-          resolve(user);
-        }, reject);
+          setTimeout(checkIfUserIsDefined, 30);
+        })();
       });
     },
     signIn(store, { email, password }) {
       return auth.signInWithEmailAndPassword(email, password);
     },
     signOut({ commit }) {
-      commit('user', null);
       return auth.signOut();
     }
   },
@@ -37,3 +35,9 @@ export default new Vuex.Store({
 
   }
 });
+
+auth.onAuthStateChanged(user => {
+  store.commit('user', user);
+});
+
+export default store;
